@@ -1,3 +1,5 @@
+import { RegexCache } from "./errorCache.js";
+
 type Confidence = "high" | "medium" | "low";
 
 type ErrorInsight = {
@@ -7,6 +9,14 @@ type ErrorInsight = {
   example?: string;
   confidence: Confidence;
 };
+
+// Create regex cache for performance optimization
+const regexCache = new RegexCache();
+
+// Optimized regex tester with caching
+function testRegex(pattern: string, text: string, flags = "i"): boolean {
+  return regexCache.compile(pattern, flags).test(text);
+}
 
 type ErrorRule = {
   id: string;
@@ -24,9 +34,7 @@ const errorRules: ErrorRule[] = [
     id: "undefined_map",
     priority: 1,
     match: (e) =>
-      /undefined.*\.map|\.map.*undefined|cannot read.*map.*of undefined/.test(
-        e,
-      ),
+      testRegex("undefined.*\\.map|\\.map.*undefined|cannot read.*map.*of undefined", e),
     insight: {
       type: "TypeError",
       cause: "Calling .map() on undefined or null value",
@@ -39,7 +47,7 @@ const errorRules: ErrorRule[] = [
   {
     id: "null_map",
     priority: 1,
-    match: (e) => /null.*\.map|\.map.*null|cannot read.*map.*of null/.test(e),
+    match: (e) => testRegex("null.*\\.map|\\.map.*null|cannot read.*map.*of null", e),
     insight: {
       type: "TypeError",
       cause: "Calling .map() on null value",
@@ -52,7 +60,7 @@ const errorRules: ErrorRule[] = [
   {
     id: "map_not_function",
     priority: 1,
-    match: (e) => /\.map is not a function|map is not a function/.test(e),
+    match: (e) => testRegex("\\.map is not a function|map is not a function", e),
     insight: {
       type: "TypeError",
       cause:
@@ -67,7 +75,7 @@ const errorRules: ErrorRule[] = [
     id: "not_a_function",
     priority: 1,
     match: (e) =>
-      /is not a function/.test(e) && !/map is not a function/.test(e),
+      testRegex("is not a function", e) && !testRegex("map is not a function", e),
     insight: {
       type: "TypeError",
       cause: "Attempting to call a value that is not a function",
@@ -80,7 +88,7 @@ const errorRules: ErrorRule[] = [
   {
     id: "cannot_read_property_of_undefined",
     priority: 1,
-    match: (e) => /cannot read propert(y|ies) .* of undefined/.test(e),
+    match: (e) => testRegex("cannot read propert(y|ies) .* of undefined", e),
     insight: {
       type: "TypeError",
       cause: "Accessing a property on an undefined value",
@@ -93,7 +101,7 @@ const errorRules: ErrorRule[] = [
   {
     id: "cannot_read_property_of_null",
     priority: 1,
-    match: (e) => /cannot read propert(y|ies) .* of null/.test(e),
+    match: (e) => testRegex("cannot read propert(y|ies) .* of null", e),
     insight: {
       type: "TypeError",
       cause: "Accessing a property on a null value",
@@ -106,7 +114,7 @@ const errorRules: ErrorRule[] = [
   {
     id: "cannot_set_property_of_undefined",
     priority: 1,
-    match: (e) => /cannot set propert(y|ies) .* of undefined/.test(e),
+    match: (e) => testRegex("cannot set propert(y|ies) .* of undefined", e),
     insight: {
       type: "TypeError",
       cause: "Setting a property on an undefined object",
@@ -119,7 +127,7 @@ const errorRules: ErrorRule[] = [
   {
     id: "cannot_set_property_of_null",
     priority: 1,
-    match: (e) => /cannot set propert(y|ies) .* of null/.test(e),
+    match: (e) => testRegex("cannot set propert(y|ies) .* of null", e),
     insight: {
       type: "TypeError",
       cause: "Setting a property on a null object",
@@ -133,10 +141,8 @@ const errorRules: ErrorRule[] = [
     id: "undefined_variable",
     priority: 1,
     match: (e) =>
-      /(\w+) is not defined/.test(e) &&
-      !/process is not defined|window is not defined|document is not defined|global is not defined/.test(
-        e,
-      ),
+      testRegex("(\\w+) is not defined", e) &&
+      !testRegex("process is not defined|window is not defined|document is not defined|global is not defined", e),
     insight: {
       type: "ReferenceError",
       cause: "Using a variable that has not been declared",
@@ -150,9 +156,7 @@ const errorRules: ErrorRule[] = [
     id: "assignment_to_constant",
     priority: 1,
     match: (e) =>
-      /assignment to constant variable|cannot assign to .* because it is a constant/.test(
-        e,
-      ),
+      testRegex("assignment to constant variable|cannot assign to .* because it is a constant", e),
     insight: {
       type: "TypeError",
       cause: "Attempting to reassign a const variable",
@@ -166,9 +170,7 @@ const errorRules: ErrorRule[] = [
     id: "readonly_property",
     priority: 1,
     match: (e) =>
-      /cannot assign to read only property|cannot set property .* which has only a getter/.test(
-        e,
-      ),
+      testRegex("cannot assign to read only property|cannot set property .* which has only a getter", e),
     insight: {
       type: "TypeError",
       cause: "Attempting to modify a read-only property",
@@ -3843,7 +3845,7 @@ const errorRules: ErrorRule[] = [
 ];
 
 // ===============================================================
-// ANALYSIS FUNCTION
+// ANALYSIS FUNCTION (OPTIMIZED WITH CACHING)
 // ===============================================================
 
 export function analyzeErrorMessage(error: string): {
@@ -3855,13 +3857,11 @@ export function analyzeErrorMessage(error: string): {
   example?: string;
   confidence: Confidence;
 } {
-  const e = error.toLowerCase();
-
   // Sort by priority (lower number = higher priority)
   const sortedRules = [...errorRules].sort((a, b) => a.priority - b.priority);
 
   for (const rule of sortedRules) {
-    if (rule.match(e)) {
+    if (rule.match(error)) {
       return {
         error,
         ruleId: rule.id,

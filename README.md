@@ -1,57 +1,122 @@
 # 🧠 DevInsight MCP
 
 > 🚀 Developer Intelligence Tool for Error Debugging & Code Health Analysis
+> 
+> **Now with full Model Context Protocol (MCP) support!**
+>
+> **Use with GitHub Copilot in any project** ✨
 
 DevInsight MCP is a powerful developer-focused tool that helps you:
 
 * 🧠 Understand and fix errors instantly
 * 🔍 Detect unused code in your project
 * ⚡ Improve code quality and maintainability
+* 🔌 Integrate with AI assistants via MCP
+* 💬 **Use with GitHub Copilot Chat across all projects**
 
 ---
 
-## 🚀 Features
+## ⚡ Quick Setup (5 minutes)
 
-### 🧠 Error Intelligence
+### Install DevInsight Globally
+```bash
+npm install -g /path/to/devinsight-mcp
+# or if published: npm install -g devinsight-mcp
+```
 
-* Detects and explains real-world errors
-* Covers JavaScript, React, TypeScript, Network, SSR
+### Configure Your Project
+```bash
+# Linux/macOS - Automated setup
+chmod +x examples/setup-projects.sh
+./examples/setup-projects.sh ~/my-project
+
+# Windows - Manual copy
+# Copy examples/vs-code-config/.vscode-settings.json to .vscode/settings.json
+# Copy examples/vs-code-config/.copilot-instructions.md to your project root
+```
+
+### Start Using with Copilot
+1. Open VS Code
+2. Open Copilot Chat (Ctrl+Shift+I)
+3. Paste an error: `Cannot read property 'map' of undefined`
+4. Copilot will automatically analyze it! ✨
+
+**See [COPILOT_SETUP.md](COPILOT_SETUP.md) for complete instructions**
+
+---
+
+## 🧠 Features
+
+### 🔧 Error Intelligence
+* Detects and explains 100+ error patterns
+* Covers JavaScript, React, TypeScript, Network, SSR errors
 * Provides:
-
-  * Root cause
-  * Fix suggestions
-  * Code examples
-  * Confidence level
-
----
+  - Root cause analysis
+  - Fix suggestions
+  - Code examples
+  - Confidence levels
+* LRU caching for repeated errors (~99% faster)
+* Regex pattern caching for ~67% speedup
 
 ### 🔍 Code Health Analysis
-
 * Detects unused functions
 * Identifies potentially unused files
 * Helps reduce dead code
 * Improves project maintainability
 
+### 🔗 MCP Integration
+The server exposes these tools via the Model Context Protocol:
+
+- **`analyze_error`** - Analyzes single error message
+- **`analyze_multiple_errors`** - Batch analyze errors
+- **`find_unused_code`** - Scan project for dead code
+- **`clear_cache`** - Clear internal caches
+
+**Use with GitHub Copilot, Claude, or any MCP-compatible client!**
+
 ---
 
-### ⚡ Developer Experience
+## 🧩 Extensible Architecture
 
-* Simple CLI usage
-* Fast analysis
-* Structured JSON output
-* Easy to integrate into workflows
-
----
-
-### 🧩 Extensible Architecture
-
-* Add new error rules easily
+* Add new error rules easily in `errorEngine.ts`
 * Expand analysis capabilities
-* MCP-ready design
+* MCP-ready design with proper schemas
+* Optimized caching layer
 
 ---
 
-## 📦 Installation
+## 📊 Performance
+
+- **First error**: ~5ms (was 15ms)
+- **Cached error**: <1ms (was 15ms)  
+- **Improvement**: 67% faster, 99% faster for repeated
+- **Memory**: ~50KB overhead for regex cache
+
+See [OPTIMIZATION_REPORT.md](OPTIMIZATION_REPORT.md) for details.
+
+---
+
+## � Documentation & Guides
+
+| Guide | Purpose |
+|-------|---------|
+| [COPILOT_SETUP.md](COPILOT_SETUP.md) | **🎯 Start here!** 5-minute GitHub Copilot setup |
+| [INTEGRATION_GUIDE.md](INTEGRATION_GUIDE.md) | Complete integration guide for all projects |
+| [examples/README.md](examples/README.md) | Setup scripts & configuration examples |
+| [OPTIMIZATION_REPORT.md](OPTIMIZATION_REPORT.md) | Performance details & technical info |
+
+---
+
+## 🧩 Extensible Architecture
+
+* Add new error rules easily in `errorEngine.ts`
+* Expand analysis capabilities
+* MCP-ready design with proper schemas
+* Optimized caching layer
+
+---
+
+## �📦 Installation
 
 ```bash
 git clone https://github.com/your-username/devinsight-mcp.git

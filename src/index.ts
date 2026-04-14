@@ -1,5 +1,5 @@
-import { analyzeErrorTool } from "./tools/analyzeError";
-import { findUnusedCodeTool } from "./tools/findUnusedCode";
+import { analyzeErrorTool } from "./tools/analyzeError.js";
+import { findUnusedCodeTool } from "./tools/findUnusedCode.js";
 
 const args = process.argv.slice(2);
 

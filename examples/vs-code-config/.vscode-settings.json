@@ -1,0 +1,22 @@
+{
+  "mcp": {
+    "enabled": true,
+    "debug": false,
+    "servers": {
+      "devinsight": {
+        "command": "node",
+        "args": [
+          "$(npm root -g)/devinsight-mcp/dist/server.js"
+        ],
+        "env": {
+          "NODE_OPTIONS": "--enable-source-maps"
+        }
+      }
+    }
+  },
+  "github.copilot.enable": {
+    "*": true,
+    "plaintext": false,
+    "markdown": true
+  }
+}
