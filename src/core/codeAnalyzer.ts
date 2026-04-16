@@ -43,12 +43,10 @@ export function findUnusedCode() {
   ) {
     if (!name) return;
 
-    const refs = (node as any).findReferences?.() || [];
-
-    const refCount = refs.reduce(
-      (acc: number, ref: any) => acc + ref.getReferences().length,
-      0,
-    );
+    const sourceText = file.getFullText();
+    const nameRegex = new RegExp(`\\b${name}\\b`, 'g');
+    const matches = sourceText.match(nameRegex) || [];
+    const refCount = matches.length - 1; // -1 for the declaration itself
 
     const isReactComponent = isJSX && /^[A-Z]/.test(name);
 
